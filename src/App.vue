@@ -1,13 +1,26 @@
 
 <template>
   <main>
-    <MainScene />
+    <GraphElement />
+    <input type="file" v-on="events" />
   </main>
 </template>
 
 <script setup lang="ts">
+import { watch } from 'vue';
+import GraphElement from './components/graph/GraphElement.vue';
 import MainScene from './components/scene/MainScene.vue';
+import { useGlobalMouseDrag, useGlobalMousePrimary } from './tools/input/mouse.tools';
+import { sourceFileUpload } from './utils/VueFileParser';
 
+const { events } = sourceFileUpload()
+
+const { dragDelta, dragStart } = useGlobalMouseDrag()
+
+
+// watch([dragDelta, dragStart], (things) => {
+//   console.log(things)
+// })
 
 </script>
 

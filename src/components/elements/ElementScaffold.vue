@@ -11,6 +11,7 @@
       <div class="move-handle" v-on="events"></div>
     </div>
   </div>
+  
 </template>
 
 <script lang="ts" setup>

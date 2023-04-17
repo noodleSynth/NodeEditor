@@ -1,14 +1,14 @@
 <template>
   <div class="scene-root" v-bind="attrs" v-on="{...events}" :style="styles">
     <div class="element-layer" :style="componentLayerStyles">
-      <!-- {{ engaged }} -->
+
       <RefElement />
     </div>
-    <!-- <div class="element-layer"  :style="componentLayerStyles"> -->
-      <LinkScaffold v-if="floatingConnection" :connection="floatingConnection"/>
-  
-      <LinkScaffold v-for="i in Connections" :key="i.id" :connection="i" />
-    <!-- </div> -->
+
+    <LinkScaffold v-if="floatingConnection" :connection="floatingConnection" ></LinkScaffold>
+
+    <LinkScaffold v-for="i in Connections" :key="i.id" :connection="i" ></LinkScaffold>
+
   </div>
 </template>
 
