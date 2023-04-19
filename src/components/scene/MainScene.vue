@@ -1,9 +1,13 @@
 <template>
   <div class="scene-root" :panning="allKeysPressed ? allKeysPressed : undefined" :style="style">
-    {{ dragDelta }}
+    <svg>
+      <g :transform="`translate(${dragTotal.join(',')})`">
+  
+        <GraphLink :link="link" v-for="link in store.uniqueLinks" :key="link.nodeIdA"  />
+      </g>
+    </svg>
     <div class="scene-body">
       <svg>
-        <GraphLink :link="link" v-for="link in store.uniqueLinks" :key="link.nodeIdA"  />
       </svg>
       <GraphElement :node="node" v-for="node in store.graphNodes" :key="node.id" />
     </div>
@@ -31,15 +35,15 @@ const { allKeysPressed } = useGlobalKeyboardKeys([KeyboardKeys.Space])
 const panTotal = ref<number[]>
 
 
-const { dragDelta } = useGlobalMouseDrag(allKeysPressed)
+const { dragTotal } = useGlobalMouseDrag(allKeysPressed)
 
 const store = useGraphStore()
 
 const style = computed(() => {
-  if(!dragDelta.value) return {}
+  if(!dragTotal.value) return {}
   return {
-    '--pan-x': `${dragDelta.value[0]}px`,
-    '--pan-y': `${dragDelta.value[1]}px`
+    '--pan-x': `${dragTotal.value[0]}px`,
+    '--pan-y': `${dragTotal.value[1]}px`
   }
 })
 
@@ -62,14 +66,16 @@ $grid-color: lighten($scene-background, 10)
   margin: 0px
   overflow: hidden
   position: relative
+  background-position-x: var(--pan-x)
+  background-position-y: var(--pan-y)
   .scene-body
     // position: absolute
     left: var(--pan-x)
     top: var(--pan-y)
   svg
-    width: min-content
-    height: min-content
-    position: relative
+    width: 100vw
+    height: 100vh
+    position: fixed
 
   &[panning]
     cursor: all-scroll

@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, type Ref, ref, watch } from "vue"
+import { onMounted, onUnmounted, type Ref, ref, watch, computed } from "vue"
 
 
 export const useGlobalMouseMove = (enabled?: Ref<boolean>) => {
@@ -81,9 +81,22 @@ export const useGlobalMouseDrag = (enabled?: Ref<boolean>) => {
   const { mousePosition, onMove } = useGlobalMouseMove(primaryButtonDown)
 
   const dragStart = ref<number[]>()
-  const dragDelta = ref<number[]>()
+  const dragDelta = ref<number[]>([0, 0])
+  
+  const dragTracker = ref<number[]>([0, 0])
+
+  const dragTotal = computed(() => {
+    if (!dragStart.value) return dragTracker.value
+    const [a, b, c, d] = [...dragDelta.value, ...dragTracker.value]
+    return [a+c, b + d]
+  })
+
 
   onMouseUp(() => {
+    if (dragStart.value) {
+      dragTracker.value = dragTotal.value
+    }
+
     dragStart.value = undefined
   })
 
@@ -98,6 +111,7 @@ export const useGlobalMouseDrag = (enabled?: Ref<boolean>) => {
   return {
     mousePosition,
     dragStart,
-    dragDelta
+    dragDelta,
+    dragTotal
   }
 }
