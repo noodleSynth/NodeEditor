@@ -67,11 +67,14 @@ export const sourceFileUpload = () => {
 
   const sections = ref<VueFile>({})
   const htmlTree = ref<HTMLTree>({})
+  const graphStore = useGraphStore()
 
   const uploadFile = (e: Event) => {
+    graphStore.$reset()
     const fe = e.target as HTMLInputElement
 
     const fileReader = new FileReader()
+    
     fileReader.onloadend = ((ev) => {
       let result = (ev.target!.result)!.toString()
       result = (window.atob(result.split(",")[1]));

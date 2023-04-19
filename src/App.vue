@@ -1,7 +1,7 @@
 
 <template>
   <main>
-    <GraphElement />
+    <MainScene />
     <input type="file" v-on="events" />
   </main>
 </template>
@@ -14,9 +14,6 @@ import { useGlobalMouseDrag, useGlobalMousePrimary } from './tools/input/mouse.t
 import { sourceFileUpload } from './utils/VueFileParser';
 
 const { events } = sourceFileUpload()
-
-const { dragDelta, dragStart } = useGlobalMouseDrag()
-
 
 // watch([dragDelta, dragStart], (things) => {
 //   console.log(things)

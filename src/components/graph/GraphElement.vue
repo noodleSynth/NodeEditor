@@ -1,41 +1,47 @@
 <template>
-  <div class="graph-element">
-    <div v-for="node in store.graphNodes" :key="node.id" :style="{'--offset-x': `${node.position[0]}px`, '--offset-y': `${node.position[1]}px`}" class="graph-node">
+  <div class="graph-element" :style="styles" ref="root">
+    <div class="node-body">
       {{ node.name }}
     </div>
-    <svg v-for="link in store.uniqueLinks" :key="link.nodeIdA" stroke="red" >
-      <path :d='pathString(link)' />
-    </svg> 
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { GraphLink } from '@/models/graph/GraphLink.model';
+import type { GraphNode } from '@/models/graph/GraphNode.model';
 import { useGraphStore } from '@/stores/Graph.store';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import GraphLinkVue from './GraphLink.vue';
 
-const store = useGraphStore()
+const props = defineProps<{
+  node: GraphNode
+}>()
 
-const pathString = (link: GraphLink) => {
-  const [a, b, c, d] = [...store.node(link.nodeIdA).position, ...store.node(link.nodeIdB).position]
+const root = ref<HTMLElement>()
 
-  return `M${a} ${b} L ${c} ${d}`
-}
-
+const styles = computed(() => {
+  let [x, y] = props.node.position
+  if (root.value) {
+    const [ width, height ] = [root.value!.clientWidth, root.value!.clientHeight]
+    console.log({x, y})
+    x -= width / 2
+    y -= height / 2
+    console.log({x, y})
+  } 
+  
+  return {'--offset-x': `${x}px`, '--offset-y': `${y}px`}
+})
 
 </script>
 
 <style lang="sass">
+
 .graph-element
-  position: relative
+  position: absolute
+  left: var(--offset-x)
+  top: var(--offset-y)
+svg
   width: 100%
   height: 100%
-  .graph-node, svg
-    position: absolute
-    left: var(--offset-x)
-    top: var(--offset-y)
-  svg
-    width: 100%
-    height: 100%
 
 </style>

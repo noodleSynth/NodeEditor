@@ -4,14 +4,16 @@ import { onMounted, onUnmounted, type Ref, ref, watch } from "vue"
 export const useGlobalMouseMove = (enabled?: Ref<boolean>) => {
 
   const mousePosition = ref<number[]>()
+  const moveCallbacks: Function[] = []
 
   const handleMouseMove = (e: Event) => {
     const event = e as MouseEvent
-    if(enabled && !enabled.value) return mousePosition.value = undefined
+    if (enabled && !enabled.value) return mousePosition.value = undefined
     mousePosition.value = [
       event.clientX,
       event.clientY
     ]
+    moveCallbacks.forEach(e => e())
   }
 
   onMounted(() => {
@@ -24,23 +26,32 @@ export const useGlobalMouseMove = (enabled?: Ref<boolean>) => {
 
 
   return {
-    mousePosition
+    mousePosition,
+    onMove: (cb: Function) => moveCallbacks.push(cb)
   }
 }
 
 export const useGlobalMousePrimary = (enabled?: Ref<boolean>) => {
 
   const primaryButtonDown = ref<boolean>(false)
+  const downCallbacks: Function[] = []
+  const upCallbacks: Function[] = []
 
   const handleMouseDown = (e: Event) => {
+
     if (enabled && !enabled.value) return
-    console.log("Tgubg")
     const event = e as MouseEvent 
-    if(event.button === 0) primaryButtonDown.value = true
+    if (event.button === 0) {
+      primaryButtonDown.value = true
+      downCallbacks.forEach(e => e())
+    }
   }
 
   const handleMouseUp = (e: Event) => {
     primaryButtonDown.value = false
+    if ((e as PointerEvent).button === 0) {
+      upCallbacks.forEach(e => e())
+    }
   }
 
   onMounted(() => {
@@ -57,38 +68,32 @@ export const useGlobalMousePrimary = (enabled?: Ref<boolean>) => {
     watch(enabled, () => primaryButtonDown.value = false)
 
   return {
-    primaryButtonDown
+    primaryButtonDown,
+    onMouseDown: (cb: Function) => downCallbacks.push(cb),
+    onMouseUp: (cb: Function) => upCallbacks.push(cb)
   }
 }
 
 export const useGlobalMouseDrag = (enabled?: Ref<boolean>) => {
 
-  const { primaryButtonDown } = useGlobalMousePrimary(enabled)
+  const { primaryButtonDown, onMouseUp } = useGlobalMousePrimary(enabled)
 
-  const { mousePosition } = useGlobalMouseMove(primaryButtonDown)
+  const { mousePosition, onMove } = useGlobalMouseMove(primaryButtonDown)
 
   const dragStart = ref<number[]>()
   const dragDelta = ref<number[]>()
 
-  watch(primaryButtonDown, (btnDown) => {
-    if (btnDown && mousePosition.value) {
-      dragDelta.value = [0, 0]
-      dragStart.value = [...mousePosition.value]
-      return
-    }
+  onMouseUp(() => {
     dragStart.value = undefined
-    dragDelta.value = undefined
   })
 
-  watch(mousePosition, (newPosition) => {
-    if (!newPosition || !dragStart.value) return
-    const [a, b, c, d] = [...newPosition, ...dragStart.value]
+  onMove(() => {
+    if (!mousePosition.value) return
+    if(!dragStart.value) dragStart.value = [...mousePosition.value]
+    const [a, b, c, d] = [...mousePosition.value, ...dragStart.value]
 
     dragDelta.value = [a - c, b - d];
-  }, {
-    deep: true
   })
-
 
   return {
     mousePosition,
