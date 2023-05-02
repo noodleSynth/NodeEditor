@@ -1,7 +1,7 @@
 <template>
-  <div class="graph-element" :style="styles" ref="root">
+  <div class="graph-element" :style="styles" ref="root" :id="node.id">
     <div class="node-body">
-      {{ node.name }}
+      <span class="node-name">{{ node.name }}</span>
     </div>
   </div>
 </template>
@@ -23,10 +23,10 @@ const styles = computed(() => {
   let [x, y] = props.node.position
   if (root.value) {
     const [ width, height ] = [root.value!.clientWidth, root.value!.clientHeight]
-    console.log({x, y})
+    // console.log({x, y})
     x -= width / 2
     y -= height / 2
-    console.log({x, y})
+    // console.log({x, y})
   } 
   
   return {'--offset-x': `${x}px`, '--offset-y': `${y}px`}
@@ -40,6 +40,16 @@ const styles = computed(() => {
   position: absolute
   left: var(--offset-x)
   top: var(--offset-y)
+  background-color: black
+  aspect-ratio: 1/1
+  border-radius: 8px
+  padding: 8px
+  border: solid white 1px
+
+  .graph-body
+    min-width: 100px
+
+
 svg
   width: 100%
   height: 100%

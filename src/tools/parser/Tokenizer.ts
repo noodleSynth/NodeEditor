@@ -1,34 +1,51 @@
-import { parse } from "@vue/compiler-dom"
 
-const tagRegex = new RegExp(/<(?<tag>[\w\-_]+)\s*(?<attributes>.*?)\s*(?<isVoid>\/?)>/)
-const closingTag = (tag: string) => new RegExp(`(<\/${tag}>)`)
+const openingRegex = new RegExp(/<(?<tag>[\w\-_]+)\s*(?<attributes>.*?)\s*(?<isVoid>\/?)>/)
+const closingTagRegex = new RegExp(/(<\/(?<tag>.+?)>\s?)/)
 
-interface ParserNode{
+export interface ParserNode{
   tag?: string,
   attributes?: string,
   children: ParserNode[],
   content?: string
 }
 
-export const tokenize = (tokens: string, parentNode: ParserNode) => {
-  console.log(tokens)
-  while(tokens.trim().length){
-    const node = {
+/**
+ * Its JENK but it works
+ */
+
+export const tokenize = (src: string, parentNode: ParserNode) => {
+  
+  let tokens = src
+  while (tokens.length) {
+    const node : ParserNode= {
       children: []
     }
-    const tagData = tagRegex.exec(tokens)
-    if(!tagData) return console.log("No Tag data", tokens)
-    
-    tokens = tokens.substring(tagData.index + tagData[0].length)
 
-    const {tag, attributes, isVoid} = tagData.groups
-    node.attributes = attributes
-    node.tag = tag
-  
-    parentNode.children.push(node)
+    const closestClosure = closingTagRegex.exec(tokens)
+    const closestOpening = openingRegex.exec(tokens)
     
-    if(!isVoid){
-      tokenize(tokens, node)
+    if (!closestOpening)
+      break
+
+    const { tag, attributes, isVoid } = closestOpening.groups!
+    
+    Object.assign(node, { tag, attributes })
+    
+    if (isVoid) {
+      tokens = tokens.substring(closestOpening.index + closestOpening[0].length)
+      parentNode.children.push(node)
+    } else if ((closestClosure && closestClosure?.index - closestOpening?.index < 0)) {
+
+      tokens = tokens.substring(closestClosure[0].length + closestClosure.index)
+      break
+    } else {
+      const seekBy = tokenize(tokens.substring(closestOpening[0].length + closestOpening.index), node)
+      tokens = tokens.substring(closestOpening[0].length + closestOpening.index + seekBy)
+      parentNode.children.push(node)
     }
+
+
+  
   }
+  return src.length - tokens.length
 }

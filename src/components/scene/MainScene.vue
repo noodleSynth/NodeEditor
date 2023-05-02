@@ -2,33 +2,24 @@
   <div class="scene-root" :panning="allKeysPressed ? allKeysPressed : undefined" :style="style">
     <svg>
       <g :transform="`translate(${dragTotal.join(',')})`">
-  
+        <GraphLink :link="link" v-for="link in store.uniqueLinks" :key="link.nodeIdA"  />
         <GraphLink :link="link" v-for="link in store.uniqueLinks" :key="link.nodeIdA"  />
       </g>
     </svg>
     <div class="scene-body">
-      <svg>
-      </svg>
       <GraphElement :node="node" v-for="node in store.graphNodes" :key="node.id" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useElementStore } from '@/stores/Element.store';
 import { useGraphStore } from '@/stores/Graph.store';
 import { useGlobalKeyboardKeys } from '@/tools/input/keyboard.tools';
 import { useGlobalMouseDrag } from '@/tools/input/mouse.tools';
-import { useKeyHold } from '@/utils/KeyHold.utils';
 import { KeyboardKeys } from '@/utils/keys';
-import { usePan } from '@/utils/Pan.util';
-import { renderConnections, useTerminals } from '@/utils/Terminal.util';
-import { computed, ref, watch } from 'vue';
-import ElementScaffold from '../elements/ElementScaffold.vue';
-import LinkScaffold from '../elements/LinkScaffold.vue';
+import { computed, ref } from 'vue';
 import GraphElement from '../graph/GraphElement.vue';
 import GraphLink from '../graph/GraphLink.vue';
-import RefElement from '../vue-elements/RefElement.vue';
 
 const { allKeysPressed } = useGlobalKeyboardKeys([KeyboardKeys.Space])
 
