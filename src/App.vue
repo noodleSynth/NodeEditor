@@ -2,15 +2,13 @@
 <template>
   <main>
     <MainScene />
-    <div>
-      <input type="file" v-on="events" />
-      <button @click="distribute">Distribute</button>
-    </div>
+    <ArchiveExplorer />
   </main>
 </template>
 
 <script setup lang="ts">
 import { watch } from 'vue';
+import ArchiveExplorer from './components/controls/ArchiveExplorer.vue';
 import GraphElement from './components/graph/GraphElement.vue';
 import MainScene from './components/scene/MainScene.vue';
 import { useGraphStore } from './stores/Graph.store';

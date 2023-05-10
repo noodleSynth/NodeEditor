@@ -1,3 +1,4 @@
+import { BlobReader, ZipReader } from '@zip.js/zip.js';
 import { tokenize, type ParserNode } from './../tools/parser/Tokenizer';
 import type { GraphNode } from "@/models/graph/GraphNode.model"
 import { useElementStore } from "@/stores/Element.store"
@@ -5,7 +6,7 @@ import { useGraphStore } from "@/stores/Graph.store"
 import { ref } from "vue"
 import { useSceneElement } from "./Element.util"
 
-const htmlTagRegex = new RegExp(/^<(?<tag>[a-zA-Z]+)\s?(?<attributes>[^\n]*?)>{1}\s*(?<content>[\w\W]*)\s*<\/\k<tag>>$/gm)
+
 const jsImportRegex = new RegExp(/^import\s(type\s)?({\s)?(?<import>[\w\W]*?)(\s})?\sfrom\s[\'\"](?<from>.*)[\'\"];$/gm)
 
 
@@ -78,44 +79,67 @@ interface VueFile{
 
 export const sourceFileUpload = () => {
 
+  
+
   const sections = ref<VueFile>({})
   const htmlTree = ref<HTMLTree>({})
   const graphStore = useGraphStore()
 
-  const uploadFile = (e: Event) => {
+  const uploadFile = async (e: Event) => {
     graphStore.$reset()
+
     const fe = e.target as HTMLInputElement
 
     const fileReader = new FileReader()
+
     
-    fileReader.onloadend = ((ev) => {
-      let result = (ev.target!.result)!.toString()
-      result = (window.atob(result.split(",")[1]));
-      let q = undefined
-      while ((q = htmlTagRegex.exec(result))) {
-        const { tag, attributes, content } = q.groups as { tag: keyof VueFile, attributes: string, content: string }
-        sections.value[tag] = {
-          attributes,
-          content
-        }
-      }
-      console.log(sections.value.template!.content)
-      // console.log(sections.value.template!.content.trim().split(/<(?<tag>\w*).*>[\w\W]*?<\/\k<tag>>/g))
-      // htmlTree.value = getChildren(sections.value.template!.content)
-      parseTemplate(sections.value.template!.content)
-      q = undefined
-      const thing = []
-      console.log(sections.value.script!.content)
-      while ((q = jsImportRegex.exec(sections.value.script!.content))) {
-        thing.push(q.groups)
-      }
-      console.table(thing)
-      // console.log(sections.value)
-      // console.log(htmlTree.value)
+
+    
+    fileReader.onloadend = ( async (ev) => {
+      const binaryString = ev.target!.result as ArrayBuffer
+
+      const blob = new Blob([binaryString], {
+        type: 'application/zip'
+      })
+      const blobReader = new BlobReader(blob)
+
+      const zipFileReader = new ZipReader(blobReader)
+      
+
+
+      // let result = (ev.target!.result)!.toString()
+      // result = (window.atob(result.split(",")[1]));
+      // let q = undefined
+      // while ((q = htmlTagRegex.exec(result))) {
+      //   const { tag, attributes, content } = q.groups as { tag: keyof VueFile, attributes: string, content: string }
+      //   sections.value[tag] = {
+      //     attributes,
+      //     content
+      //   }
+      // }
+      // console.log(sections.value.template!.content)
+      // // console.log(sections.value.template!.content.trim().split(/<(?<tag>\w*).*>[\w\W]*?<\/\k<tag>>/g))
+      // // htmlTree.value = getChildren(sections.value.template!.content)
+      // parseTemplate(sections.value.template!.content)
+      // q = undefined
+      // const thing = []
+      // console.log(sections.value.script!.content)
+      // while ((q = jsImportRegex.exec(sections.value.script!.content))) {
+      //   thing.push(q.groups)
+      // }
+      // console.table(thing)
+      // // console.log(sections.value)
+      // // console.log(htmlTree.value)
     })
 
+    const blobReader = new BlobReader(fe.files![0])
 
-    fileReader.readAsDataURL(fe.files![0])
+    const zipFileReader = new ZipReader(blobReader)
+    const entries = await zipFileReader.getEntries()
+      entries.forEach(e => {
+        console.log(e)
+      })
+    // fileReader.readAsBinaryString(fe.files![0])
   }
 
   return {
