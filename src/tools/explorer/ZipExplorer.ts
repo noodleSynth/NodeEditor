@@ -15,12 +15,12 @@ export const useRepoArchive = () => {
   
   const isLoading = ref(true)
   
-  const loadArchiveFile = (file: Blob) => {
+  const loadArchiveFile = async (file: Blob) => {
     const fileReader = new BlobReader(file)
   
     const zipReader = new ZipReader(fileReader)
 
-    zipReader.getEntries().then(entries => {
+    await zipReader.getEntries().then(entries => {
       entries.forEach((entry) => {
         if(entry.filename.includes('/node_modules/') || entry.filename.includes('/.git/') || entry.filename.includes('/.') || entry.filename.startsWith('__') || entry.directory)
           return
@@ -29,6 +29,7 @@ export const useRepoArchive = () => {
       })
       isLoading.value = false
     })
+    return true
   }
 
 
@@ -59,10 +60,19 @@ export const useRepoArchive = () => {
     return ret
   })
 
+  const appEntry = () => {
+    console.log(fileEntries.value)
+    if(Object.values(fileEntries.value).length === 0) return undefined
+    const candidate = Object.keys(fileEntries.value).find(key => key.endsWith('App.vue'))
+    if(!candidate) return undefined
+    return fileEntries.value[candidate]
+  }
+
   
   return {
     fileEntries,
     entryTree,
+    appEntry,
     loadArchiveFile
   }
 }

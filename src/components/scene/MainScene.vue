@@ -1,11 +1,11 @@
 <template>
   <div class="scene-root" :panning="allKeysPressed ? allKeysPressed : undefined" :style="style">
-    <svg>
+    <!-- <svg>
       <g :transform="`translate(${dragTotal.join(',')})`">
         <GraphLink :link="link" v-for="link in store.uniqueLinks" :key="link.nodeIdA"  />
         <GraphLink :link="link" v-for="link in store.uniqueLinks" :key="link.nodeIdA"  />
       </g>
-    </svg>
+    </svg> -->
     <div class="scene-body">
       <GraphElement :node="node" v-for="node in store.graphNodes" :key="node.id" />
     </div>

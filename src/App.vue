@@ -14,9 +14,7 @@ import MainScene from './components/scene/MainScene.vue';
 import { useGraphStore } from './stores/Graph.store';
 import { distributeElements } from './tools/graph/graphNode.tools';
 import { useGlobalMouseDrag, useGlobalMousePrimary } from './tools/input/mouse.tools';
-import { sourceFileUpload } from './utils/VueFileParser';
 
-const { events } = sourceFileUpload()
 
 const distribution = distributeElements()
 

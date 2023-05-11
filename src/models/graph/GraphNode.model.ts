@@ -1,4 +1,4 @@
-export enum NodeType{
+export enum GraphNodeType{
   HTMLNode,
   Component
 }
@@ -7,5 +7,6 @@ export interface GraphNode{
   id: string,
   position: number[],
   name: string,
-  type: NodeType
+  type: GraphNodeType,
+  children?: GraphNode[]
 }

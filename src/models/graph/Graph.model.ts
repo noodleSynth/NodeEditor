@@ -6,9 +6,6 @@ export interface Graph{
   nodes: {
     [id: string]: GraphNode
   },
-  links: {
-    [id: string] : GraphLink[]
-  }
   zoom: number,
   pan: number[] 
 }

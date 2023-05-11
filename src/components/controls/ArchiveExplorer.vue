@@ -10,40 +10,50 @@
 
 <script lang="ts" setup>
 import { useRepoArchive } from '@/tools/explorer/ZipExplorer';
-import { parseTemplate } from '@/tools/parser/Tokenizer';
+import { useGraph } from '@/tools/graph/graph.tools';
 import { useVueFileParser } from '@/tools/parser/VueFileParser';
 import { TextWriter, type Entry } from '@zip.js/zip.js';
 import ArchiveExpander from './ArchiveExpander.vue';
 
 const handleInput = (e: Event) => {
   const target = (e.target) as HTMLInputElement
-  loadArchiveFile(target.files![0])
+  loadArchiveFile(target.files![0]).then(() => { 
+    const entry = appEntry()
+    if(!entry) return alert("Could not find app entry")
+    handleFileSelect(entry)
+  })
 }
 
 
 const handleFileSelect = (e: Entry) => {
   const textWriter = new TextWriter();
-  e.getData!(textWriter).then(data => {
+  e.getData!(textWriter).then( async (data) => {
 
     const file = (parseVueSource(data))
-    parseTemplate(file.template.rawContent)
+
+    const template = (await parseVueTemplate(file.template.rawContent))
+    const script = await (file.script ? parseVueScript(file.script.rawContent) : undefined)
+    buildNodeGraph(template, script).then(() => {
+      placeNodes([100, 100])
+    })
   })
 }
 
 
 
-const {parseVueSource} = useVueFileParser()
-const {fileEntries, loadArchiveFile, entryTree} = useRepoArchive()
-
+const {parseVueSource, parseVueTemplate, parseVueScript} = useVueFileParser()
+const {fileEntries, loadArchiveFile, entryTree, appEntry} = useRepoArchive()
+const { buildNodeGraph, placeNodes, root } = useGraph()
 
 </script>
 
 <style lang="sass">
 .archive-explorer
   overflow: hidden
+  overflow-y: auto
   height: 80vh
   width: 20em
   .archive-file-list
     overflow-y: auto
-    height: 100%
+    height: auto
 </style>
