@@ -28,6 +28,7 @@ const props = defineProps<{
 }>()
 
 const isTree = (q: any) => {
+  if(!q) return false
   return Object.hasOwn(q, '__is_tree_node')
 }
 

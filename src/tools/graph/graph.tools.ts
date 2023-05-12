@@ -49,6 +49,8 @@ export const useGraph = () => {
     if(!root.value) return
     root.value.position = pos
 
+    let maxY = 0
+
     const placeChildren = (parent: GraphNode) => {
       if(!parent.children) return
       const el = document.getElementById(parent.id)
@@ -57,8 +59,10 @@ export const useGraph = () => {
       const {width, height} = el.getBoundingClientRect()
 
       parent.children.forEach((child, i) => {
-        child.position = [parent.position[0] + width + 50, parent.position[1] + (i * (50 + height))]
-        
+        child.position = [parent.position[0] + width + 50, Math.max(parent.position[1], maxY) + (i * (50 + height))]
+
+        maxY = Math.max(parent.position[1], maxY)
+
         console.log(child.name, child.position, [width, height])
         placeChildren(child)
       })

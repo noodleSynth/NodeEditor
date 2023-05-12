@@ -1,14 +1,15 @@
 <template>
   <div class="scene-root" :panning="allKeysPressed ? allKeysPressed : undefined" :style="style">
-    <!-- <svg>
-      <g :transform="`translate(${dragTotal.join(',')})`">
-        <GraphLink :link="link" v-for="link in store.uniqueLinks" :key="link.nodeIdA"  />
-        <GraphLink :link="link" v-for="link in store.uniqueLinks" :key="link.nodeIdA"  />
-      </g>
-    </svg> -->
     <div class="scene-body">
       <GraphElement :node="node" v-for="node in store.graphNodes" :key="node.id" />
     </div>
+    <svg>
+      <g :transform="`translate(${dragTotal.join(',')})`" >
+        <template v-for="node in store.graphNodes" :key="node.id">
+          <GraphLink :link="{nodeIdA: node.id, nodeIdB: child.id}" v-for="child in node.children" :key="child.id"  />
+        </template>
+      </g>
+    </svg>
   </div>
 </template>
 

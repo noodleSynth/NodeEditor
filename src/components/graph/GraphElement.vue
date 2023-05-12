@@ -1,5 +1,5 @@
 <template>
-  <div class="graph-element" :style="styles" ref="root" :id="node.id">
+  <div class="graph-element" :class="GraphNodeType[node.type]" :style="styles" ref="root" :id="node.id">
     <div class="node-body">
       <span class="node-name">{{ node.name }}</span>
     </div>
@@ -8,7 +8,7 @@
 
 <script lang="ts" setup>
 import type { GraphLink } from '@/models/graph/GraphLink.model';
-import type { GraphNode } from '@/models/graph/GraphNode.model';
+import { GraphNodeType, type GraphNode } from '@/models/graph/GraphNode.model';
 import { useGraphStore } from '@/stores/Graph.store';
 import { computed, ref } from 'vue';
 import GraphLinkVue from './GraphLink.vue';
@@ -24,7 +24,7 @@ const styles = computed(() => {
   if (root.value) {
     const [ width, height ] = [root.value!.clientWidth, root.value!.clientHeight]
     // console.log({x, y})
-    x -= width / 2
+    // x -= width / 2
     y -= height / 2
     // console.log({x, y})
   } 
@@ -40,11 +40,15 @@ const styles = computed(() => {
   position: absolute
   left: var(--offset-x)
   top: var(--offset-y)
+  min-width: 200px
   background-color: black
-  aspect-ratio: 1/1
   border-radius: 8px
   padding: 8px
   border: solid white 1px
+  &.Component
+    background-color: #004400
+    .node-name
+      font-weight: 700
 
   .graph-body
     min-width: 100px
