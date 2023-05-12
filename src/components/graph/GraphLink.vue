@@ -1,7 +1,7 @@
 <template>
-    <path fill="transparent" :d="`M${linkStartPoint} L${linkEndPoint}`" stroke="green"></path>
-    <circle r="2" fill="red" :cx="linkStartArray[0]" :cy="linkStartArray[1]" ></circle>
-    <circle r="2" fill="yellow" :cx="linkEndArray[0]" :cy="linkEndArray[1]" ></circle>
+    <path fill="transparent" :d="`M${linkStartPoint} L${linkEndPoint}`" stroke-width="5" stroke="green"></path>
+    <circle r="3" fill="red" :cx="linkStartArray[0]" :cy="linkStartArray[1]" ></circle>
+    <circle r="5" fill="yellow" :cx="linkEndArray[0]" :cy="linkEndArray[1]" ></circle>
 </template>
 
 <script lang="ts" setup>

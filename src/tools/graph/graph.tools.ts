@@ -1,4 +1,4 @@
-import { GraphNodeType, type GraphNode } from './../../models/graph/GraphNode.model';
+import { GraphNodeType, navigationTags, type GraphNode, structuralTags } from './../../models/graph/GraphNode.model';
 import { useGraphStore } from "@/stores/Graph.store";
 import type { VueTemplateNode, VueScript } from "../parser/VueFileParser";
 import { ref } from 'vue';
@@ -25,7 +25,7 @@ export const useGraph = () => {
       const tag = node.tag!
       if(!script) return undefined
       return script.imports.find((i) => {
-        return i.import.includes(tag)
+        return i.import.map(t => t.toLowerCase()).includes(tag.replaceAll('-', '').toLowerCase())
       })
     }
 
@@ -34,8 +34,16 @@ export const useGraph = () => {
       node.children.forEach((n) => {
         const childNode = graphStore.registerNode(n)
         const nodeImportPath = getNodeImport(n)?.from
+
+        const testTag = n.tag!.replaceAll('-', '').toLocaleLowerCase()
         if(nodeImportPath) childNode.type = GraphNodeType.Component
 
+        if(navigationTags.includes(testTag))
+          childNode.type = GraphNodeType.Navigation
+
+        if(structuralTags.includes(testTag))
+          childNode.type = GraphNodeType.Structural
+          
         if(!parent.children) parent.children = []
         parent.children.push(childNode)
         traverseTemplateNode(n, childNode)

@@ -45,10 +45,13 @@ const styles = computed(() => {
   border-radius: 8px
   padding: 8px
   border: solid white 1px
+  font-weight: 700
   &.Component
     background-color: #004400
-    .node-name
-      font-weight: 700
+  &.Structural
+    background-color: #002544
+  &.Navigation
+    background-color: #004400
 
   .graph-body
     min-width: 100px
