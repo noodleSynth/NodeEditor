@@ -1,4 +1,8 @@
+import type { Ref } from "vue";
+import type { GraphNode } from "./GraphNode.model";
+
 export interface GraphLink{
-  nodeIdA: string,
-  nodeIdB: string,
+  id: string,
+  a: Ref<GraphNode>,
+  b: Ref<GraphNode>,
 }

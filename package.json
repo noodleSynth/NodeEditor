@@ -12,6 +12,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@vue/compiler-core": "^3.3.4",
     "@zip.js/zip.js": "^2.7.9",
     "pinia": "^2.0.32",
     "sass": "^1.59.3",

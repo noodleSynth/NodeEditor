@@ -6,6 +6,7 @@
 
 <script lang="ts" setup>
 import type { GraphLink } from '@/models/graph/GraphLink.model';
+import type { GraphNode } from '@/models/graph/GraphNode.model';
 import { useGraphStore } from '@/stores/Graph.store';
 import { computed } from 'vue';
 
@@ -17,14 +18,15 @@ const props = defineProps<{
 const store = useGraphStore()
 
 const startDimensions = computed(() => {
-  const startElement = store.node(props.link.nodeIdA)
+  const startElement = (props.link.a as any) as GraphNode
+
   const htmlEl = document.getElementById(startElement.id)
   const {width, height} = htmlEl!.getBoundingClientRect()
   return [width, height]
 })
 
 const linkStartPoint = computed(() => {
-  const startElement = store.node(props.link.nodeIdA)
+  const startElement = (props.link.a as any) as GraphNode
   const [x, y] = startElement.position
 
   const [width, height] = startDimensions.value
@@ -32,19 +34,19 @@ const linkStartPoint = computed(() => {
 })
 
 const linkStartArray = computed(() => {
-  const startElement = store.node(props.link.nodeIdA)
+  const startElement = (props.link.a as any) as GraphNode
   const [width, height] = startDimensions.value
   const [x, y] = startElement.position
   return [x + width, y]
 })
 
 const linkEndArray = computed(() => {
-  const startElement = store.node(props.link.nodeIdB)
+  const startElement = (props.link.b as any) as GraphNode
   return startElement.position
 })
 
 const linkEndPoint = computed(() => {
-  const endElement = store.node(props.link.nodeIdB)
+  const endElement = (props.link.b as any) as GraphNode
   const [x, y] = endElement.position
   return `${x} ${y}`
 })

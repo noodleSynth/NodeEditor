@@ -5,9 +5,7 @@
     </div>
     <svg>
       <g :transform="`translate(${dragTotal.join(',')})`" >
-        <template v-for="node in store.graphNodes" :key="node.id">
-          <GraphLink :link="{nodeIdA: node.id, nodeIdB: child.id}" v-for="child in node.children" :key="child.id"  />
-        </template>
+          <GraphLink :link="link" v-for="link in store.links" :key="link.id" />
       </g>
     </svg>
   </div>

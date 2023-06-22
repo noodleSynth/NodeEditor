@@ -5,6 +5,8 @@ const openingRegex = new RegExp(/<(?<tag>[\w\-_]+)\s*(?<attributes>.*?)\s*(?<isV
 const closingTagRegex = new RegExp(/(<\/(?<tag>.+?)>\s?)/)
 const jsImportRegex = new RegExp(/^import\s(type\s)?({\s)?(?<importEls>[\w\W]*?)(\s})?\sfrom\s[\'\"](?<from>.*)[\'\"];$/gm)
 
+import {baseParse, transform, baseCompile} from '@vue/compiler-core'
+
 export interface VueTemplateNode{
   tag?: string,
   attributes?: string,
@@ -80,6 +82,38 @@ interface VueFile {
   style?: VueStyleSection
 }
 
+import * as ts from 'typescript'
+
+export const TypeLookup = [
+"ROOT",
+"ELEMENT",
+"TEXT",
+"COMMENT",
+"SIMPLE_EXPRESSION",
+"INTERPOLATION",
+"ATTRIBUTE",
+"DIRECTIVE",
+"COMPOUND_EXPRESSION",
+"IF",
+"IF_BRANCH",
+"FOR",
+"TEXT_CALL",
+"VNODE_CALL",
+"JS_CALL_EXPRESSION",
+"JS_OBJECT_EXPRESSION",
+"JS_PROPERTY",
+"JS_ARRAY_EXPRESSION",
+"JS_FUNCTION_EXPRESSION",
+"JS_CONDITIONAL_EXPRESSION",
+"JS_CACHE_EXPRESSION",
+"JS_BLOCK_STATEMENT",
+"JS_TEMPLATE_LITERAL",
+"JS_IF_STATEMENT",
+"JS_ASSIGNMENT_EXPRESSION",
+"JS_SEQUENCE_EXPRESSION",
+"JS_RETURN_STATEMENT"
+]
+
 export const useVueFileParser = () => {
 
   const parseVueSource = (source: string) => {
@@ -98,18 +132,23 @@ export const useVueFileParser = () => {
     return vueFile
   }
 
-  const parseVueTemplate = async (src : string) => {
-    const parsedRoot = {
-      tag: "Vue Root",
-      children: []
-    }
-    buildTemplateTree(src, parsedRoot)
-    return parsedRoot
+  const parseVueTemplate = async (src: string) => {
+    const t = baseParse(src)
+    transform(t, {})
+    console.log(t)
+
+    // type: NodeTypes
+    // tagType: ElementTypes
+
+
+    return t
   }
 
   
   const parseVueScript = async (src: string) : Promise<VueScript> => {
     let q = undefined
+    const d = ts.createSourceFile("heck", src, { languageVersion: ts.ScriptTarget.ES2022 })
+    // d.forEachChild(e => console.log(e))
     const imports = []
     while ((q = jsImportRegex.exec(src))) {
       const {importEls, from} = q.groups as {importEls: string, from: string}

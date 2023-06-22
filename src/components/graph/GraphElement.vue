@@ -1,21 +1,29 @@
 <template>
-  <div class="graph-element" :class="GraphNodeType[node.type]" :style="styles" ref="root" :id="node.id">
+  <div class="graph-element" :style="styles" ref="root" :class="{[GraphNodeType[node.type]]: true}" :id="node.id">
     <div class="node-body">
-      <span class="node-name">{{ node.name }}</span>
+      <span class="node-name">
+        {{ node.name }}
+      </span>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { GraphLink } from '@/models/graph/GraphLink.model';
-import { GraphNodeType, type GraphNode } from '@/models/graph/GraphNode.model';
+import type { GraphNode } from '@/models/graph/GraphNode.model';
+import { GraphNodeType } from '@/models/graph/GraphNode.model'
 import { useGraphStore } from '@/stores/Graph.store';
+import { useGraphNode } from '@/tools/graph/graphNode.tools';
+import { TypeLookup } from '@/tools/parser/VueFileParser';
 import { computed, ref } from 'vue';
 import GraphLinkVue from './GraphLink.vue';
 
 const props = defineProps<{
   node: GraphNode
 }>()
+
+const nodeRef = computed(() => props.node)
+// const node = useGraphNode(nodeRef)
 
 const root = ref<HTMLElement>()
 
@@ -46,12 +54,16 @@ const styles = computed(() => {
   padding: 8px
   border: solid white 1px
   font-weight: 700
+  &.Element
+    background-color: #004400
   &.Component
-    background-color: #004400
-  &.Structural
     background-color: #002544
-  &.Navigation
-    background-color: #004400
+  &.Template
+    background-color: #994444
+  &.Slot
+    background-color: #999944
+  &.Root
+    background-color: #994499
 
   .graph-body
     min-width: 100px

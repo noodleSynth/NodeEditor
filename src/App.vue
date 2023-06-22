@@ -12,21 +12,9 @@ import ArchiveExplorer from './components/controls/ArchiveExplorer.vue';
 import GraphElement from './components/graph/GraphElement.vue';
 import MainScene from './components/scene/MainScene.vue';
 import { useGraphStore } from './stores/Graph.store';
-import { distributeElements } from './tools/graph/graphNode.tools';
+
 import { useGlobalMouseDrag, useGlobalMousePrimary } from './tools/input/mouse.tools';
 
-
-const distribution = distributeElements()
-
-const distribute = () => {
-  const graphStore = useGraphStore()
-  Object.entries(graphStore.links).forEach(([id, links], i, arr) => {
-    // console.log({id, links})
-    const nodes = links.map(l => graphStore.node(l.nodeIdB))
-    distribution.distributeY([graphStore.node(id), ...nodes])
-  })
-  
-}
 
 
 // watch([dragDelta, dragStart], (things) => {
