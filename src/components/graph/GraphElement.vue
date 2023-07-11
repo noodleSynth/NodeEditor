@@ -66,8 +66,12 @@ const styles = computed(() => {
   }
 
   return {
-    "--offset-x": `${x + dragDelta.value[0]}px`,
-    "--offset-y": `${y + dragDelta.value[1]}px`,
+    "--offset-x": `${
+      x + dragDelta.value[0] * ((dragStart.value !== undefined) as any)
+    }px`,
+    "--offset-y": `${
+      y + dragDelta.value[1] * ((dragStart.value !== undefined) as any)
+    }px`,
   };
 });
 
