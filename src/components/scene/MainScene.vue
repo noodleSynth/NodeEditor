@@ -1,11 +1,15 @@
 <template>
-  <div class="scene-root" :panning="allKeysPressed ? allKeysPressed : undefined" :style="style">
+  <div
+    class="scene-root"
+    :panning="allKeysPressed ? allKeysPressed : undefined"
+    :style="style"
+  >
     <div class="scene-body">
       <GraphElement :node="node" v-for="node in store.graphNodes" :key="node.id" />
     </div>
-    <svg>
-      <g :transform="`translate(${dragTotal.join(',')})`" >
-          <GraphLink :link="link" v-for="link in store.links" :key="link.id" />
+    <svg style="pointer-events: none">
+      <g :transform="`translate(${dragTotal.join(',')})`">
+        <GraphLink :link="link" v-for="link in store.links" :key="link.id" />
       </g>
     </svg>
   </div>
@@ -36,9 +40,6 @@ const style = computed(() => {
     '--pan-y': `${dragTotal.value[1]}px`
   }
 })
-
-
-
 </script>
 
 <style lang="sass">

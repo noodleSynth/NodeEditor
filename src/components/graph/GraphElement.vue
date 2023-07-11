@@ -1,45 +1,81 @@
 <template>
-  <div class="graph-element" :style="styles" ref="root" :class="{[GraphNodeType[node.type]]: true}" :id="node.id">
-    <div class="node-body">
+  <div
+    class="graph-element"
+    :style="styles"
+    ref="root"
+    :class="{ [GraphNodeType[node.type]]: true }"
+    :id="node.id"
+  >
+    <div class="node-header">
       <span class="node-name">
         {{ node.name }}
       </span>
+      <span
+        tabindex="1"
+        class="click-drag-handle"
+        @mouseleave="isInside = dragStart !== undefined"
+        @mouseenter="isInside = true"
+      >
+      </span>
+      <span style="margin-top: -4px; aspect-ratio: 1/1" @click="showBody = !showBody">{{
+        showBody ? "v" : "<"
+      }}</span>
+    </div>
+    <div class="node-body" v-if="showBody">
+      <ul>
+        <li v-for="i in 10" :key="i">Attr {{ i }}</li>
+      </ul>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import type { GraphLink } from '@/models/graph/GraphLink.model';
-import type { GraphNode } from '@/models/graph/GraphNode.model';
-import { GraphNodeType } from '@/models/graph/GraphNode.model'
-import { useGraphStore } from '@/stores/Graph.store';
-import { useGraphNode } from '@/tools/graph/graphNode.tools';
-import { TypeLookup } from '@/tools/parser/VueFileParser';
-import { computed, ref } from 'vue';
-import GraphLinkVue from './GraphLink.vue';
+import type { GraphLink } from "@/models/graph/GraphLink.model";
+import type { GraphNode } from "@/models/graph/GraphNode.model";
+import { GraphNodeType } from "@/models/graph/GraphNode.model";
+import { useGraphStore } from "@/stores/Graph.store";
+import { useGraphNode } from "@/tools/graph/graphNode.tools";
+import { useGlobalMouseDrag } from "@/tools/input/mouse.tools";
+import { TypeLookup } from "@/tools/parser/VueFileParser";
+import { computed, ref, watch, watchEffect } from "vue";
+import GraphLinkVue from "./GraphLink.vue";
 
 const props = defineProps<{
-  node: GraphNode
-}>()
+  node: GraphNode;
+}>();
 
-const nodeRef = computed(() => props.node)
+const graphStore = useGraphStore();
+
+const nodeRef = computed(() => graphStore.node(props.node.id));
 // const node = useGraphNode(nodeRef)
 
-const root = ref<HTMLElement>()
+const root = ref<HTMLElement>();
+const showBody = ref(false);
+const isInside = ref(false);
+
+const { dragDelta, dragStart, dragTotal } = useGlobalMouseDrag(isInside);
 
 const styles = computed(() => {
-  let [x, y] = props.node.position
+  let [x, y] = props.node.position;
   if (root.value) {
-    const [ width, height ] = [root.value!.clientWidth, root.value!.clientHeight]
+    const [width, height] = [root.value!.clientWidth, root.value!.clientHeight];
     // console.log({x, y})
     // x -= width / 2
-    y -= height / 2
+    y -= height / 2;
     // console.log({x, y})
-  } 
-  
-  return {'--offset-x': `${x}px`, '--offset-y': `${y}px`}
-})
+  }
 
+  return {
+    "--offset-x": `${x + dragDelta.value[0]}px`,
+    "--offset-y": `${y + dragDelta.value[1]}px`,
+  };
+});
+
+watch(dragStart, (n, o) => {
+  if (n || !o) return (isInside.value = true);
+  nodeRef.value.position[0] += dragDelta.value[0];
+  nodeRef.value.position[1] += dragDelta.value[1];
+});
 </script>
 
 <style lang="sass">
@@ -51,9 +87,9 @@ const styles = computed(() => {
   min-width: 200px
   background-color: black
   border-radius: 8px
-  padding: 8px
   border: solid white 1px
-  font-weight: 700
+  user-select: none
+
   &.Element
     background-color: #004400
   &.Component
@@ -65,12 +101,41 @@ const styles = computed(() => {
   &.Root
     background-color: #994499
 
-  .graph-body
-    min-width: 100px
+  .node-body
+    margin: 4px 8px
+    padding: 4px
+    border: grey 1px dashed
+    &:hover
+      border-color: white
+
+    ul
+      list-style: none
+      padding: 0px
+      li
+        font-size: .8em
+  .node-header
+    padding: 4px 8px
+    display: flex
+    justify-content: space-between
+    align-items: center
+    .click-drag-handle
+      border-top: 1px solid grey
+      border-bottom: 1px solid grey
+      padding: 1px 0px
+      margin: auto 4px
+      width: 100%
+      height: min-content
+      cursor: grab
+      &:hover
+        border-color: white
+      &:active
+        cursor: grabbing
+    .node-name
+      font-weight: 700
+      color: white
 
 
 svg
   width: 100%
   height: 100%
-
 </style>
