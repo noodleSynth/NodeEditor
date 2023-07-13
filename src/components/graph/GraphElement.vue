@@ -5,25 +5,22 @@
     ref="root"
     :class="{ [GraphNodeType[node.type]]: true }"
     :id="node.id"
+    @mouseleave="isInside = false"
   >
     <div class="node-header">
       <span class="node-name">
         {{ node.name }}
       </span>
-      <span
-        tabindex="1"
-        class="click-drag-handle"
-        @mouseleave="isInside = dragStart !== undefined"
-        @mouseenter="isInside = true"
-      >
-      </span>
+      <span tabindex="1" class="click-drag-handle" @mouseenter="isInside = true"> </span>
       <span style="margin-top: -4px; aspect-ratio: 1/1" @click="showBody = !showBody">{{
         showBody ? "v" : "<"
       }}</span>
     </div>
     <div class="node-body" v-if="showBody">
       <ul>
-        <li v-for="i in 10" :key="i">Attr {{ i }}</li>
+        <li v-for="i in node.props" :key="i.name">
+          <GraphProp v-bind="i" />
+        </li>
       </ul>
     </div>
   </div>
@@ -37,8 +34,10 @@ import { useGraphStore } from "@/stores/Graph.store";
 import { useGraphNode } from "@/tools/graph/graphNode.tools";
 import { useGlobalMouseDrag } from "@/tools/input/mouse.tools";
 import { TypeLookup } from "@/tools/parser/VueFileParser";
+import type { DirectiveNode, SimpleExpressionNode } from "@vue/compiler-core";
 import { computed, ref, watch, watchEffect } from "vue";
 import GraphLinkVue from "./GraphLink.vue";
+import GraphProp from "./GraphProp.vue";
 
 const props = defineProps<{
   node: GraphNode;

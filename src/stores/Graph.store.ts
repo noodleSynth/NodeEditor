@@ -6,12 +6,12 @@ import type { GraphNode } from "@/models/graph/GraphNode.model";
 import { GraphNodeType } from "@/models/graph/GraphNode.model";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import type { Node, ElementNode, RootNode, NodeTypes } from '@vue/compiler-core'
+import type { Node, ElementNode, RootNode, NodeTypes } from '@vue/compiler-core';
 
 
 
 export const useGraphStore = defineStore("Graph store", {
-  state: (): Graph =>  ({
+  state: (): Graph => ({
     nodes: {},
     links: {},
     zoom: 1,
@@ -22,11 +22,11 @@ export const useGraphStore = defineStore("Graph store", {
     graphNodes: (state) => Object.values(state.nodes),
     node: (state) => (id: string) => state.nodes[id],
   },
-  
+
   actions: {
     registerLink(link: GraphLink) {
       if (!link.id)
-        link.id = crypto.randomUUID()
+        link.id = crypto.randomUUID();
       this.links[link.id] = link;
     },
 
@@ -38,25 +38,26 @@ export const useGraphStore = defineStore("Graph store", {
         links: [],
         children: [],
         name: "node",
-        type: Object.hasOwn(templateNode, 'tagType') ? (templateNode as ElementNode).tagType : GraphNodeType.Root
-      } as GraphNode
-      if(templateNode.type == 0)
-        node.name = "Root"
+        type: Object.hasOwn(templateNode, 'tagType') ? (templateNode as ElementNode).tagType : GraphNodeType.Root,
+        props: Object.hasOwn(templateNode, 'tagType') ? (templateNode as ElementNode).props : undefined
+      } as GraphNode;
+      if (templateNode.type == 0)
+        node.name = "Root";
       else
         switch (templateNode.tagType) {
           case 1:
           case 0:
-            node.name = templateNode.tag
-            break
+            node.name = templateNode.tag;
+            break;
           case 3:
           case 2:
-            node.name = "Slot"
-            break
+            node.name = "Slot";
+            break;
         }
 
-      this.nodes[node.id] = node
+      this.nodes[node.id] = node;
 
-      return node
+      return node;
     }
   }
-})
+});
